@@ -2,7 +2,7 @@
 This repository contains guidelines for Axway's go workshop.
 
 # Introduction
-This document will quickly cover (reference) some of the information in (gotour)[https://tour.golang.org]
+This document will quickly cover (reference) some of the information at https://tour.golang.org
 
 ```go
 package main

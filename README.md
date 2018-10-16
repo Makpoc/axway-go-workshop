@@ -144,7 +144,6 @@ fmt.Println(compute(power))
 ```
 
 ## Basics
-### File structure
 ###  Variables
 ```go
 var x int

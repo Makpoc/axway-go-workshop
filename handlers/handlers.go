@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/makpoc/axway-go-workshop/storage"
 	"github.com/teris-io/shortid"
 )
 
@@ -22,11 +23,12 @@ type response struct {
 type Handler struct {
 	// BaseURL is the schema://host:port/ of the service. It is used when generating the short URL
 	BaseURL string
+	Storage storage.Storage
 }
 
 // New constructs a new Handler and configures it with the provided baseURL
-func New(baseURL string) Handler {
-	return Handler{baseURL}
+func New(baseURL string, storage storage.Storage) Handler {
+	return Handler{baseURL, storage}
 }
 
 // Shorten is a handleFunc that expects a POST request with a json payload and returns a response, containing the
@@ -54,12 +56,18 @@ func (h Handler) Shorten(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	err = h.Storage.Save(short, msg.URL)
+	if err != nil {
+		log.Printf("Failed to store the short id: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	responseBody := response{
 		OriginalURL: msg.URL,
 		ShortURL:    h.BaseURL + short,
 	}
 
-	// notice = instead of :=
 	err = json.NewEncoder(w).Encode(responseBody)
 	if err != nil {
 		log.Printf("Failed to encode response: %v", err)

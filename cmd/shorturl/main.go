@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/makpoc/axway-go-workshop/storage/mapstore"
 	"github.com/teris-io/shortid"
 
 	"github.com/makpoc/axway-go-workshop/handlers"
@@ -25,7 +26,9 @@ func main() {
 	}
 	shortid.SetDefault(sid)
 
-	handler := handlers.New(fmt.Sprintf("http://localhost:%s/", port))
+	handler := handlers.New(
+		fmt.Sprintf("http://localhost:%s/", port),
+		mapstore.New())
 
 	http.HandleFunc("/shorten", handler.Shorten)
 

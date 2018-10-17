@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -24,7 +25,9 @@ func main() {
 	}
 	shortid.SetDefault(sid)
 
-	http.HandleFunc("/shorten", handlers.Shorten)
+	handler := handlers.New(fmt.Sprintf("http://localhost:%s/", port))
+
+	http.HandleFunc("/shorten", handler.Shorten)
 
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

@@ -17,7 +17,15 @@ type response struct {
 	ShortURL    string `json:"short_url"`
 }
 
-func Shorten(w http.ResponseWriter, r *http.Request) {
+type Handler struct {
+	BaseURL string
+}
+
+func New(baseURL string) Handler {
+	return Handler{baseURL}
+}
+
+func (h Handler) Shorten(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		log.Printf("Method %s not allowed for encoding", r.Method)
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -42,7 +50,7 @@ func Shorten(w http.ResponseWriter, r *http.Request) {
 
 	responseBody := response{
 		OriginalURL: msg.URL,
-		ShortURL:    short,
+		ShortURL:    h.BaseURL + short,
 	}
 
 	// notice = instead of :=

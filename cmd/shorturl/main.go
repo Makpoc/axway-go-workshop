@@ -4,6 +4,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/makpoc/axway-go-workshop/handlers"
 )
 
 func main () {
@@ -13,9 +15,8 @@ func main () {
 	}
 	log.Printf("Starting server on %s", port)
 
-	http.HandleFunc("/", welcome)
-	http.HandleFunc("/postParser", postParser)
-
+	http.HandleFunc("/", handlers.Welcome)
+	http.HandleFunc("/postParser", handlers.PostParser)
 
 	log.Fatal(http.ListenAndServe(":" + port, nil))
 }

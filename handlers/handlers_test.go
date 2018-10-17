@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"net/http"
@@ -21,7 +21,7 @@ func TestPostParser(t *testing.T) {
 	respRecorder := httptest.NewRecorder()
 
 	// actions
-	postParser(respRecorder, req)
+	PostParser(respRecorder, req)
 
 	// verifications
 	if respRecorder.Code != http.StatusOK {
@@ -43,7 +43,7 @@ func TestPostParser_badMethod(t *testing.T) {
 	respRecorder := httptest.NewRecorder()
 
 	// actions
-	postParser(respRecorder, req)
+	PostParser(respRecorder, req)
 
 	// verifications
 	if respRecorder.Code != http.StatusMethodNotAllowed {
@@ -64,7 +64,7 @@ func TestPostParser_badBody(t *testing.T) {
 	respRecorder := httptest.NewRecorder()
 
 	// actions
-	postParser(respRecorder, req)
+	PostParser(respRecorder, req)
 
 	// verifications
 	if respRecorder.Code != http.StatusBadRequest {

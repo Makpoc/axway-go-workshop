@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"encoding/json"
@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func welcome(w http.ResponseWriter, r *http.Request) {
+func Welcome(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Welcome"))
 }
@@ -15,7 +15,7 @@ type postMessage struct {
 	URL string `json:"url"`
 }
 
-func postParser(w http.ResponseWriter, r *http.Request) {
+func PostParser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		log.Printf("Method %s not allowed for encoding", r.Method)
 		w.WriteHeader(http.StatusMethodNotAllowed)

@@ -1,0 +1,30 @@
+package main
+
+import (
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
+)
+
+func TestPostParser(t *testing.T) {
+	// stubs, spies, preparation
+
+	// build the request
+	rBody := strings.NewReader(`{"url" : "localhost"}`)
+	req, err := http.NewRequest(http.MethodPost, "/postParser", rBody)
+	if err != nil {
+		t.Fatalf("Failed to build request: %v", err)
+	}
+
+	// a response recorder implements the ResponseWriter interface and acts as a spy we can later inspect
+	respRecorder := httptest.NewRecorder()
+
+	// actions
+	postParser(respRecorder, req)
+
+	// verifications
+	if respRecorder.Code != http.StatusOK {
+		t.Fatalf("expected status code %d, got %d", http.StatusOK, respRecorder.Code)
+	}
+}

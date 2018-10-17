@@ -1,10 +1,11 @@
 package handlers
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/teris-io/shortid"
 )
 
 type postMessage struct {
@@ -32,7 +33,12 @@ func Shorten(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	short := base64.URLEncoding.EncodeToString([]byte(msg.URL))
+	short, err := shortid.Generate()
+	if err != nil {
+		log.Printf("Failed to generate a short id: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	responseBody := response{
 		OriginalURL: msg.URL,

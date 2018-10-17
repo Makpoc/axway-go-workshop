@@ -1,21 +1,22 @@
 package handlers
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"log"
 	"net/http"
 )
 
-func Welcome(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Welcome"))
-}
-
 type postMessage struct {
 	URL string `json:"url"`
 }
 
-func PostParser(w http.ResponseWriter, r *http.Request) {
+type response struct {
+	OriginalURL string `json:"original_url"`
+	ShortURL    string `json:"short_url"`
+}
+
+func Shorten(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		log.Printf("Method %s not allowed for encoding", r.Method)
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -31,5 +32,16 @@ func PostParser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("Got %v", msg)
+	short := base64.URLEncoding.EncodeToString([]byte(msg.URL))
+
+	responseBody := response{
+		OriginalURL: msg.URL,
+		ShortURL:    short,
+	}
+
+	// notice = instead of :=
+	err = json.NewEncoder(w).Encode(responseBody)
+	if err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }

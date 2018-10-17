@@ -15,8 +15,7 @@ func main () {
 	}
 	log.Printf("Starting server on %s", port)
 
-	http.HandleFunc("/", handlers.Welcome)
-	http.HandleFunc("/postParser", handlers.PostParser)
+	http.HandleFunc("/shorten", handlers.Shorten)
 
 	log.Fatal(http.ListenAndServe(":" + port, nil))
 }

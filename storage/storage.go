@@ -14,5 +14,5 @@ type Storage interface {
 // ShortIDNotFoundErr is the error returned when an item matching the shortid was not found
 var ShortIDNotFoundErr = fmt.Errorf("shortid not found")
 
-// ShortIDAlreadyExistsError is the error returned when trying to save an item with already existing shortid.
-var ShortIDAlreadyExistsError = fmt.Errorf("conflict: shortid already exists")
+// ShortIDAlreadyExistsErr is the error returned when trying to save an item with already existing shortid.
+var ShortIDAlreadyExistsErr = fmt.Errorf("conflict: shortid already exists")

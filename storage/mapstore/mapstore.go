@@ -6,21 +6,21 @@ import (
 	"github.com/makpoc/axway-go-workshop/storage"
 )
 
-// mapStore implements the storage interface with an underlying map as a key-value store.
-type mapStore map[string]string
+// MapStore implements the storage interface with an underlying map as a key-value store.
+type MapStore map[string]string
 
 // New creates a new map store.
-func New() mapStore {
+func New() MapStore {
 	var store = make(map[string]string)
-	return mapStore(store)
+	return MapStore(store)
 }
 
-// Save stores the shortid and url pair in the map store. It returns storage.ShortIDAlreadyExistsError if the shortid
+// Save stores the shortid and url pair in the map store. It returns storage.ShortIDAlreadyExistsErr if the shortid
 // exists.
-func (m mapStore) Save(shortid, url string) error {
+func (m MapStore) Save(shortid, url string) error {
 	// _ means we will not be using the value
 	if _, exists := m[shortid]; exists {
-		return storage.ShortIDAlreadyExistsError
+		return storage.ShortIDAlreadyExistsErr
 	}
 	m[shortid] = url
 	log.Printf("Saving [%s]=%s. Total entries: %d", shortid, url, len(m))
@@ -29,7 +29,7 @@ func (m mapStore) Save(shortid, url string) error {
 
 // Load loads the url for given shortid from the map store. It returns storage.ShortIDNotFoundErr if the shortid cannot
 // be found.
-func (m mapStore) Load(shortid string) (string, error) {
+func (m MapStore) Load(shortid string) (string, error) {
 	// _ means we will not be using the value
 	if _, exists := m[shortid]; !exists {
 		return "", storage.ShortIDNotFoundErr

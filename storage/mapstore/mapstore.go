@@ -15,12 +15,12 @@ func New() MapStore {
 
 // Save stores the shortid and item pair in the map store. It returns storage.ShortIDAlreadyExistsErr if the shortid
 // exists.
-func (m MapStore) Save(shortID string, item storage.Item) error {
+func (m MapStore) Save(item storage.Item) error {
 	// _ means we will not be using the value
-	if _, exists := m[shortID]; exists {
+	if _, exists := m[item.ShortID]; exists {
 		return storage.ShortIDAlreadyExistsErr
 	}
-	m[shortID] = item
+	m[item.ShortID] = item
 	// log.Printf("Saving [%s]=%s. Total entries: %d", shortid, url, len(m))
 	return nil
 }

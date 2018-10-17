@@ -58,7 +58,7 @@ func (h Handler) Shorten(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.Storage.Save(short, storage.Item{
+	err = h.Storage.Save(storage.Item{
 		ShortID: short,
 		OriginalURL: msg.URL,
 		CreatedAt:   time.Now(),

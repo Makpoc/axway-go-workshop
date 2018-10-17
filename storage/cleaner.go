@@ -20,8 +20,6 @@ func Clean(store Storage) {
 				log.Printf("Removed item with shortID: %s", item.ShortID)
 			}
 		}
-
 		time.Sleep(5 * time.Second)
 	}
-
 }

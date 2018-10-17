@@ -8,7 +8,7 @@ import (
 // Storage describes the interface any implementation must comply to
 type Storage interface {
 	// Save saves an item in the storage.
-	Save(shortID string, item Item) error
+	Save(item Item) error
 	// Load loads the item for given shortid. It returns an error if something goes wrong. It will return the
 	// concrete error ShortIDNotFoundErr if we have no record for the provided shortid
 	Load(shortID string) (Item, error)

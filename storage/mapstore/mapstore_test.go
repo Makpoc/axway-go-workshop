@@ -2,7 +2,9 @@ package mapstore_test
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
+	"time"
 
 	"github.com/makpoc/axway-go-workshop/storage"
 	"github.com/makpoc/axway-go-workshop/storage/mapstore"
@@ -18,6 +20,16 @@ func TestNew(t *testing.T) {
 	}
 }
 
+func buildStorageItem(id int) storage.Item {
+	// please ignore. I'm in a hurry :)
+	return storage.Item{
+		ShortID:     fmt.Sprintf("id%d", id),
+		OriginalURL: fmt.Sprintf("url%d", id),
+		CreatedAt:   time.Unix(0, 0),
+		ExpireAfter: 1 * time.Second,
+	}
+}
+
 func TestMapStore_Save(t *testing.T) {
 	t.Parallel()
 
@@ -27,7 +39,7 @@ func TestMapStore_Save(t *testing.T) {
 		t.Fatalf("Save(): expected len(store) 0, got %d", len(store))
 	}
 
-	err := store.Save("id1", "url1")
+	err := store.Save(buildStorageItem(1))
 	if err != nil {
 		t.Fatalf("Save(): expected no error, got %v", err)
 	}
@@ -35,7 +47,7 @@ func TestMapStore_Save(t *testing.T) {
 		t.Fatalf("Save(): expected len(store) 1, got %d", len(store))
 	}
 
-	err = store.Save("id2", "url2")
+	err = store.Save(buildStorageItem(2))
 	if err != nil {
 		t.Fatalf("Save(): expected no error, got %v", err)
 	}
@@ -49,8 +61,9 @@ func TestMapStore_Save_conflict(t *testing.T) {
 
 	store := mapstore.New()
 
-	store.Save("id1", "url1")
-	err := store.Save("id1", "url1")
+	testItem := buildStorageItem(1)
+	store.Save(testItem)
+	err := store.Save(testItem)
 	if err != storage.ShortIDAlreadyExistsErr {
 		t.Fatalf("Save(): expected ShortIDAlreadyExistsErr, got %v", err)
 	}
@@ -64,47 +77,47 @@ func TestMapStore_Load(t *testing.T) {
 
 	store := mapstore.New()
 
-	store.Save("id1", "url1")
-	store.Save("id2", "url2")
-	store.Save("id3", "url3")
+	store.Save(buildStorageItem(1))
+	store.Save(buildStorageItem(2))
+	store.Save(buildStorageItem(3))
 
 	tt := []struct {
 		testName     string
 		givenShortId string
 		expectErr    error
-		expectURL    string
+		expectItem   storage.Item
 	}{
 		{
 			testName:     "first",
-			givenShortId: "id1",
+			givenShortId: "id1", // 😭
 			expectErr:    nil,
-			expectURL:    "url1",
+			expectItem:   buildStorageItem(1),
 		}, {
 			testName:     "second",
-			givenShortId: "id2",
+			givenShortId: "id2", // 😭
 			expectErr:    nil,
-			expectURL:    "url2",
+			expectItem:   buildStorageItem(2),
 		}, {
 			testName:     "third",
-			givenShortId: "id3",
+			givenShortId: "id3", // 😭
 			expectErr:    nil,
-			expectURL:    "url3",
+			expectItem:   buildStorageItem(3),
 		}, {
 			testName:     "nonExistent",
 			givenShortId: "id4",
 			expectErr:    storage.ShortIDNotFoundErr,
-			expectURL:    "",
+			expectItem:   storage.Item{},
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(subTest *testing.T) {
-			url, err := store.Load(tc.givenShortId)
+			item, err := store.Load(tc.givenShortId)
 			if err != tc.expectErr {
-				t.Fatalf("Load(): expected no error, got %v", tc.expectErr)
+				subTest.Fatalf("Load(): expected no error, got %v", tc.expectErr)
 			}
-			if url != tc.expectURL {
-				t.Fatalf("Load(): expected url1, got %s", tc.expectURL)
+			if !reflect.DeepEqual(item, tc.expectItem) {
+				subTest.Fatalf("Load(): expected %v, got %v", item, tc.expectItem)
 			}
 		})
 	}
@@ -112,15 +125,16 @@ func TestMapStore_Load(t *testing.T) {
 
 func ExampleMapStore() {
 	store := mapstore.New()
-	store.Save("id1", "https://chucknorrisfacts.net/random-fact")
-	store.Save("id2", "https://www.google.com/search?q=do+a+barrel+roll")
+	store.Save(storage.Item{ShortID: "id1", OriginalURL: "https://chucknorrisfacts.net/random-fact"})
+	store.Save(storage.Item{ShortID: "id2", OriginalURL: "https://www.google.com/search?q=do+a+barrel+roll"})
 
-	var url string
-	url, _ = store.Load("id1")
-	fmt.Println(url)
+	var item storage.Item
+	item, _ = store.Load("id1")
+	fmt.Println(item.OriginalURL)
 
-	url, _ = store.Load("id2")
-	fmt.Println(url)
+	item, _ = store.Load("id2")
+	fmt.Println(item.OriginalURL)
+
 	// Output:
 	// https://chucknorrisfacts.net/random-fact
 	// https://www.google.com/search?q=do+a+barrel+roll
@@ -129,6 +143,9 @@ func ExampleMapStore() {
 func BenchmarkMapStore_Save(b *testing.B) {
 	store := mapstore.New()
 	for n := 0; n < b.N; n++ {
-		store.Save(fmt.Sprintf("id%d", n), "url")
+		store.Save(storage.Item{
+			ShortID:     fmt.Sprintf("id%d", n),
+			OriginalURL: "https://chucknorrisfacts.net/random-fact"},
+		)
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/makpoc/axway-go-workshop/storage"
 	"github.com/teris-io/shortid"
@@ -57,7 +58,12 @@ func (h Handler) Shorten(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.Storage.Save(short, msg.URL)
+	err = h.Storage.Save(short, storage.Item{
+		ShortID: short,
+		OriginalURL: msg.URL,
+		CreatedAt:   time.Now(),
+		ExpireAfter: 10 * time.Second,
+	})
 	if err != nil {
 		log.Printf("Failed to store the short id: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -88,7 +94,7 @@ func (h Handler) Redirect(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	url, err := h.Storage.Load(short)
+	item, err := h.Storage.Load(short)
 	if err != nil {
 		log.Printf("Failed to load the short id: %v", err)
 		if err == storage.ShortIDNotFoundErr {
@@ -98,7 +104,7 @@ func (h Handler) Redirect(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	w.Header().Set("Location", url)
+	w.Header().Set("Location", item.OriginalURL)
 	w.WriteHeader(http.StatusMovedPermanently)
 }
 

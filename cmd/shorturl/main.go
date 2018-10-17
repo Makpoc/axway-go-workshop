@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/makpoc/axway-go-workshop/storage"
 	"github.com/makpoc/axway-go-workshop/storage/mapstore"
 	"github.com/teris-io/shortid"
 
@@ -26,9 +27,12 @@ func main() {
 	}
 	shortid.SetDefault(sid)
 
-	handler := handlers.New(
-		fmt.Sprintf("http://localhost:%s/redirect/", port),
-		mapstore.New())
+	baseURL := fmt.Sprintf("http://localhost:%s/redirect/", port)
+	store := mapstore.New()
+	handler := handlers.New(baseURL, store)
+
+	// Spawns a new goroutine
+	go storage.Clean(store)
 
 	http.HandleFunc("/shorten", handler.Shorten)
 	// note the trailing slash - this means match /redirect/*

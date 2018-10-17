@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/makpoc/axway-go-workshop/storage"
 	"github.com/teris-io/shortid"
@@ -35,7 +36,7 @@ func New(baseURL string, storage storage.Storage) Handler {
 // generated short URL
 func (h Handler) Shorten(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		log.Printf("Method %s not allowed for encoding", r.Method)
+		log.Printf("Method %s not allowed for shorten", r.Method)
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
@@ -72,4 +73,37 @@ func (h Handler) Shorten(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("Failed to encode response: %v", err)
 	}
+}
+
+// Redirect redirects the user to the original URL based on provided shortid.
+func (h Handler) Redirect(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		log.Printf("Method %s not allowed for redirect", r.Method)
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	short := getCleanShortFromPath(r.URL.Path)
+	if short == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	url, err := h.Storage.Load(short)
+	if err != nil {
+		log.Printf("Failed to load the short id: %v", err)
+		if err == storage.ShortIDNotFoundErr {
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		return
+	}
+	w.Header().Set("Location", url)
+	w.WriteHeader(http.StatusMovedPermanently)
+}
+
+func getCleanShortFromPath(path string) string {
+	short := strings.TrimPrefix(path, "/redirect")
+	short = strings.TrimPrefix(short, "/")
+	return strings.TrimSpace(short)
 }

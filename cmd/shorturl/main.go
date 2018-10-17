@@ -15,7 +15,7 @@ import (
 func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "6789"
 	}
 	log.Printf("Starting server on %s", port)
 
@@ -27,10 +27,12 @@ func main() {
 	shortid.SetDefault(sid)
 
 	handler := handlers.New(
-		fmt.Sprintf("http://localhost:%s/", port),
+		fmt.Sprintf("http://localhost:%s/redirect/", port),
 		mapstore.New())
 
 	http.HandleFunc("/shorten", handler.Shorten)
+	// note the trailing slash - this means match /redirect/*
+	http.HandleFunc("/redirect/", handler.Redirect)
 
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

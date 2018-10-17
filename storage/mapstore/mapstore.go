@@ -1,6 +1,8 @@
 package mapstore
 
 import (
+	"log"
+
 	"github.com/makpoc/axway-go-workshop/storage"
 )
 
@@ -21,6 +23,7 @@ func (m mapStore) Save(shortid, url string) error {
 		return storage.ShortIDAlreadyExistsError
 	}
 	m[shortid] = url
+	log.Printf("Saving [%s]=%s. Total entries: %d", shortid, url, len(m))
 	return nil
 }
 

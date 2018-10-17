@@ -1,10 +1,12 @@
-package handlers
+package handlers_test
 
 import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/makpoc/axway-go-workshop/handlers"
 )
 
 func TestPostParser(t *testing.T) {
@@ -21,7 +23,7 @@ func TestPostParser(t *testing.T) {
 	respRecorder := httptest.NewRecorder()
 
 	// actions
-	PostParser(respRecorder, req)
+	handlers.PostParser(respRecorder, req)
 
 	// verifications
 	if respRecorder.Code != http.StatusOK {
@@ -43,7 +45,7 @@ func TestPostParser_badMethod(t *testing.T) {
 	respRecorder := httptest.NewRecorder()
 
 	// actions
-	PostParser(respRecorder, req)
+	handlers.PostParser(respRecorder, req)
 
 	// verifications
 	if respRecorder.Code != http.StatusMethodNotAllowed {
@@ -64,7 +66,7 @@ func TestPostParser_badBody(t *testing.T) {
 	respRecorder := httptest.NewRecorder()
 
 	// actions
-	PostParser(respRecorder, req)
+	handlers.PostParser(respRecorder, req)
 
 	// verifications
 	if respRecorder.Code != http.StatusBadRequest {

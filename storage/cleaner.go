@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// Clean cleans up expired links.
 func Clean(store Storage) {
 	for {
 		log.Println("Cleaning up")

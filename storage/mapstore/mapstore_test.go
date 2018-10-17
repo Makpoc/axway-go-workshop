@@ -9,6 +9,8 @@ import (
 )
 
 func TestNew(t *testing.T) {
+	t.Parallel()
+
 	store := mapstore.New()
 
 	if store == nil {
@@ -17,6 +19,8 @@ func TestNew(t *testing.T) {
 }
 
 func TestMapStore_Save(t *testing.T) {
+	t.Parallel()
+
 	store := mapstore.New()
 
 	if len(store) != 0 {
@@ -41,6 +45,8 @@ func TestMapStore_Save(t *testing.T) {
 }
 
 func TestMapStore_Save_conflict(t *testing.T) {
+	t.Parallel()
+
 	store := mapstore.New()
 
 	store.Save("id1", "url1")
@@ -54,6 +60,8 @@ func TestMapStore_Save_conflict(t *testing.T) {
 }
 
 func TestMapStore_Load(t *testing.T) {
+	t.Parallel()
+
 	store := mapstore.New()
 
 	store.Save("id1", "url1")
@@ -72,17 +80,17 @@ func TestMapStore_Load(t *testing.T) {
 			expectErr:    nil,
 			expectURL:    "url1",
 		}, {
-			testName: "second",
+			testName:     "second",
 			givenShortId: "id2",
 			expectErr:    nil,
 			expectURL:    "url2",
 		}, {
-			testName: "third",
+			testName:     "third",
 			givenShortId: "id3",
 			expectErr:    nil,
 			expectURL:    "url3",
 		}, {
-			testName: "nonExistent",
+			testName:     "nonExistent",
 			givenShortId: "id4",
 			expectErr:    storage.ShortIDNotFoundErr,
 			expectURL:    "",
@@ -116,4 +124,11 @@ func ExampleMapStore() {
 	// Output:
 	// https://chucknorrisfacts.net/random-fact
 	// https://www.google.com/search?q=do+a+barrel+roll
+}
+
+func BenchmarkMapStore_Save(b *testing.B) {
+	store := mapstore.New()
+	for n := 0; n < b.N; n++ {
+		store.Save(fmt.Sprintf("id%d", n), "url")
+	}
 }

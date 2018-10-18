@@ -269,6 +269,22 @@ default:
 }
 ```
 
+### Select 
+> The select statement lets a goroutine wait on multiple communication operations.
+```go
+for {
+    select {
+    case c <- x:
+        x, y = y, x+y
+    case <-quit:
+        fmt.Println("quit")
+        return
+    default:
+    	fmt.Println("Default case while waiting for the cases to unblock")
+    }
+}
+```
+
 ## Methods
 ```go
 // Value receiver

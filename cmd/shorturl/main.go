@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/makpoc/axway-go-workshop/storage"
 	"github.com/makpoc/axway-go-workshop/storage/mapstore"
@@ -29,14 +30,20 @@ func main() {
 
 	baseURL := fmt.Sprintf("http://localhost:%s/redirect/", port)
 	store := mapstore.New()
-	handler := handlers.New(baseURL, store)
 
+	stopCleanChan := make(chan bool)
 	// Spawns a new goroutine
-	go storage.Clean(store)
+	storageCleaner := storage.NewCleaner(store, 5*time.Second, stopCleanChan)
+
+	handler := handlers.New(baseURL, store, storageCleaner)
+
+	go storageCleaner.Clean()
 
 	http.HandleFunc("/shorten", handler.Shorten)
 	// note the trailing slash - this means match /redirect/*
 	http.HandleFunc("/redirect/", handler.Redirect)
+	http.HandleFunc("/stopCleaner", handler.StopCleaner)
+
 
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

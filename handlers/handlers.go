@@ -26,11 +26,12 @@ type Handler struct {
 	// BaseURL is the schema://host:port/ of the service. It is used when generating the short URL
 	BaseURL string
 	Storage storage.Storage
+	StorageCleaner *storage.Cleaner
 }
 
 // New constructs a new Handler and configures it with the provided baseURL
-func New(baseURL string, storage storage.Storage) Handler {
-	return Handler{baseURL, storage}
+func New(baseURL string, storage storage.Storage, storageCleaner *storage.Cleaner) Handler {
+	return Handler{baseURL, storage, storageCleaner}
 }
 
 // Shorten is a handleFunc that expects a POST request with a json payload and returns a response, containing the
@@ -112,4 +113,15 @@ func getCleanShortFromPath(path string) string {
 	short := strings.TrimPrefix(path, "/redirect")
 	short = strings.TrimPrefix(short, "/")
 	return strings.TrimSpace(short)
+}
+
+func (h Handler) StopCleaner(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		log.Printf("Method %s not allowed for /stopCleaner", r.Method)
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	h.StorageCleaner.Stop()
+	w.WriteHeader(http.StatusOK)
 }

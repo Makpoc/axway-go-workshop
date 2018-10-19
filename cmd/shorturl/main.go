@@ -42,7 +42,7 @@ func main() {
 	http.HandleFunc("/shorten", handler.Shorten)
 	// note the trailing slash - this means match /redirect/*
 	http.HandleFunc("/redirect/", handler.Redirect)
-	http.HandleFunc("/stopCleaner", handler.StopCleaner)
+	http.HandleFunc("/stopCleaner", handlers.WithApiTokenAuth("secret123", handler.StopCleaner))
 
 
 	log.Fatal(http.ListenAndServe(":"+port, nil))

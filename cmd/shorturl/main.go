@@ -32,11 +32,12 @@ func main() {
 	store := mapstore.New()
 
 	stopCleanChan := make(chan bool)
-	// Spawns a new goroutine
+
 	storageCleaner := storage.NewCleaner(store, 5*time.Second, stopCleanChan)
 
 	handler := handlers.New(baseURL, store, storageCleaner)
 
+	// Spawns a new goroutine
 	go storageCleaner.Clean()
 
 	http.HandleFunc("/shorten", handler.Shorten)

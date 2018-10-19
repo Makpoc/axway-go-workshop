@@ -23,7 +23,7 @@ func NewCleaner(storage Storage, cleanInterval time.Duration, stopChan chan bool
 // Clean cleans up expired links.
 func (c *Cleaner) Clean() {
 
-	CleaLoop:
+CleanLoop:
 	for {
 		select {
 		case <-time.Tick(c.CleanInterval):
@@ -32,7 +32,7 @@ func (c *Cleaner) Clean() {
 			// Alternatively we can just return
 			// log.Println("Cleaner stopped!")
 			// return
-			break CleaLoop
+			break CleanLoop
 		}
 	}
 	log.Println("Cleaner stopped!")

@@ -35,24 +35,24 @@ func TestMapStore_Save(t *testing.T) {
 
 	store := mapstore.New()
 
-	if len(store) != 0 {
-		t.Fatalf("Save(): expected len(store) 0, got %d", len(store))
+	if len(store.List()) != 0 {
+		t.Fatalf("Save(): expected len(store) 0, got %d", len(store.List()))
 	}
 
 	err := store.Save(buildStorageItem(1))
 	if err != nil {
 		t.Fatalf("Save(): expected no error, got %v", err)
 	}
-	if len(store) != 1 {
-		t.Fatalf("Save(): expected len(store) 1, got %d", len(store))
+	if len(store.List()) != 1 {
+		t.Fatalf("Save(): expected len(store) 1, got %d", len(store.List()))
 	}
 
 	err = store.Save(buildStorageItem(2))
 	if err != nil {
 		t.Fatalf("Save(): expected no error, got %v", err)
 	}
-	if len(store) != 2 {
-		t.Fatalf("Save(): expected len(store) 2, got %d", len(store))
+	if len(store.List()) != 2 {
+		t.Fatalf("Save(): expected len(store) 2, got %d", len(store.List()))
 	}
 }
 
@@ -67,8 +67,8 @@ func TestMapStore_Save_conflict(t *testing.T) {
 	if err != storage.ShortIDAlreadyExistsErr {
 		t.Fatalf("Save(): expected ShortIDAlreadyExistsErr, got %v", err)
 	}
-	if len(store) != 1 {
-		t.Fatalf("Save(): expected len(store) 1, got %d", len(store))
+	if len(store.List()) != 1 {
+		t.Fatalf("Save(): expected len(store) 1, got %d", len(store.List()))
 	}
 }
 
